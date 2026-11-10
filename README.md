@@ -8,9 +8,9 @@ It investigates whether a chip-scale atomic clock (CSAC) with a breakthrough sho
 stability of **ADEV < 1 × 10⁻¹⁵ at τ = 1 s** (otherwise Microchip SA65 reference specs)
 creates measurable, system-level value in **distributed radar**.
 
-> **Project status:** the clock noise model (Phase 1) and the multi-node radar synchronisation
-> and timing-error model (Phase 2: relative time/phase error, coherent integration loss) are
-> implemented and numerically validated. All system parameters are assumptions and all results
+> **Project status:** the clock noise model (Phase 1), the multi-node radar synchronisation
+> and timing-error model (Phase 2), the API/dashboard (Phase 2.5) and the sensitivity analysis with
+> modelled clock-stability requirements (Phase 3) are implemented and numerically validated. All system parameters are assumptions and all results
 > are simulated. The repository makes **no detection-range, RCS or operational performance claims**.
 
 ## Validation principles (from the challenge brief)
@@ -27,7 +27,8 @@ The simulation is designed to satisfy the challenge's *Validation evidence* crit
 
 Model documentation:
 [docs/clock_noise_model.md](docs/clock_noise_model.md) (Phase 1) ·
-[docs/radar_timing_model.md](docs/radar_timing_model.md) (Phase 2).
+[docs/radar_timing_model.md](docs/radar_timing_model.md) (Phase 2) ·
+[docs/sensitivity_analysis.md](docs/sensitivity_analysis.md) (Phase 3).
 Regenerate the Phase 2 results with `cd backend && .venv/bin/python scripts/phase2_report.py`.
 
 ## Repository layout
@@ -50,7 +51,8 @@ radarsync/
 │   │   ├── network.py        Multi-node timing with synchronisation
 │   │   ├── coherence.py      Coherent gain + analytical expectations
 │   │   ├── radar.py          Relative time/phase error, coherent loss, comparisons
-│   │   └── consistency.py    Model-implied phase noise vs. SA65 limits
+│   │   ├── consistency.py    Model-implied phase noise vs. SA65 limits
+│   │   └── sensitivity.py    Parameter sweeps and clock-stability requirement solver
 │   ├── scripts/              Reproducible reports (phase2_report.py)
 │   ├── tests/                pytest suite (tests/sim: numerical validation)
 │   └── requirements.txt
@@ -109,6 +111,9 @@ over `radarsync_sim`; it contains no physics. Interactive documentation: http://
 | POST | `/api/v1/clock/adev` | Analytic ADEV curves (constrained range flagged) and simulated overlapping ADEV |
 | POST | `/api/v1/network/timing` | Relative timing-error time series for a node pair (clock vs. non-clock) |
 | POST | `/api/v1/radar/coherence` | Temporal and spatial coherent-integration loss per scenario (Monte Carlo) |
+| GET | `/api/v1/sensitivity/options` | Sweepable parameters, default values, limits and uncertainty note |
+| POST | `/api/v1/sensitivity/sweep` | One-parameter sensitivity sweep (total / clock-only / non-clock loss with Monte Carlo SE) |
+| POST | `/api/v1/sensitivity/clock-requirement` | Modelled minimum clock stability for a loss target, with feasibility status |
 
 Requests are validated (node count, carrier frequency, durations, sync interval, seeds, array sizes) and
 bounded by a computation budget; invalid requests return HTTP 422 with a readable message.

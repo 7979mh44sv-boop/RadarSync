@@ -6,6 +6,7 @@ import ClockStabilityPanel from "@/components/panels/ClockStabilityPanel";
 import CoherencePanel from "@/components/panels/CoherencePanel";
 import ControlsPanel, { specOf } from "@/components/panels/ControlsPanel";
 import ProvenancePanel from "@/components/panels/ProvenancePanel";
+import Phase3Section from "@/components/Phase3Section";
 import TimingErrorPanel from "@/components/panels/TimingErrorPanel";
 import {
   api,
@@ -211,6 +212,9 @@ export default function Dashboard() {
             <StatusBlock state={coh.state} error={coh.error} empty="Run a simulation to compute coherence metrics." height={300} />
           )}
         </Panel>
+
+        <Phase3Section config={ranConfig} scenarios={scenarios.scenarios} selected={selected}
+          maxSamples={params.limits.max_samples_per_node} />
 
         <Panel id="provenance" eyebrow="E · Provenance & limitations" title="What is sourced, assumed, hypothetical and simulated"
           subtitle="Every number in this dashboard carries one of four labels. Hover a badge for its definition.">

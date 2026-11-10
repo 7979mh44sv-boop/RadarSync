@@ -18,6 +18,7 @@ network       Multi-node clock + non-clock errors with synchronisation correctio
 coherence     Coherent-integration gain and analytical expectations.
 radar         Relative time/phase error and coherent loss metrics; scenario comparison.
 consistency   Model-implied phase noise vs. sourced SA65 limits.
+sensitivity   Parameter sweeps and modelled clock-stability requirements (Phase 3).
 """
 
-__version__ = "0.3.0"
+__version__ = "0.4.0"

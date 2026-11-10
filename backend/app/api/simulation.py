@@ -3,6 +3,7 @@
 from fastapi import APIRouter, HTTPException
 
 from app import schemas as S
+from app.services import sensitivity as sens
 from app.services import simulation as svc
 
 router = APIRouter(prefix="/api/v1", tags=["simulation"])
@@ -47,5 +48,27 @@ def post_timing(req: S.TimingRequest) -> S.TimingSeriesOut:
 def post_coherence(req: S.CoherenceRequest) -> S.CoherenceOut:
     try:
         return svc.coherence(req)
+    except KeyError as e:
+        raise _not_found(e) from None
+
+
+@router.get("/sensitivity/options", response_model=S.SensitivityOptionsOut, summary="Sweepable parameters and limits")
+def get_sensitivity_options() -> S.SensitivityOptionsOut:
+    return sens.options()
+
+
+@router.post("/sensitivity/sweep", response_model=S.SweepOut, summary="One-parameter sensitivity sweep")
+def post_sweep(req: S.SweepRequest) -> S.SweepOut:
+    try:
+        return sens.sweep(req)
+    except KeyError as e:
+        raise _not_found(e) from None
+
+
+@router.post("/sensitivity/clock-requirement", response_model=S.RequirementsOut,
+             summary="Modelled minimum clock stability for a coherence-loss target")
+def post_clock_requirement(req: S.RequirementRequest) -> S.RequirementsOut:
+    try:
+        return sens.requirement(req)
     except KeyError as e:
         raise _not_found(e) from None

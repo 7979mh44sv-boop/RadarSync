@@ -8,8 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "test": "tsx --test tests/format.test.ts",
-    "test:integration": "tsx --test tests/render.integration.test.tsx"
+    "test": "tsx --test tests/format.test.ts tests/sensitivity.test.ts",
+    "test:integration": "tsx --test tests/render.integration.test.tsx tests/phase3.integration.test.tsx"
   },
   "dependencies": {
     "next": "16.4.6",

@@ -262,3 +262,149 @@ class LimitationsOut(BaseModel):
     sa65_phase_noise_check: list[PhaseNoiseCheckOut]
     max_model_excess_db: float
     statements: list[str]
+
+
+# ---------------------------------------------------------------------------
+# Phase 3: sensitivity analysis and clock-stability requirements
+# ---------------------------------------------------------------------------
+SWEEP_MAX_VALUES = 12
+SENSITIVITY_MAX_WORK_UNITS = 200_000_000
+"""Budget for sensitivity requests (about 5 s): see app.services.sensitivity for the cost model."""
+REALIZATION_MAX_VALUES = 4_000_000
+"""Monte Carlo runs x nodes x samples held in memory per base clock (about 64 MB)."""
+
+SweepParameter = Literal["clock_scale", "carrier_frequency_hz", "n_nodes", "observation_s",
+                         "sync_interval_s", "sync_mode", "clock_correlation"]
+CoherenceMetric = Literal["temporal", "spatial"]
+
+
+class LossEstimateOut(BaseModel):
+    loss_db: float
+    se_db: float | None = Field(description="Delta-method standard error of the Monte Carlo mean; null for one run.")
+    band_db: tuple[float, float] = Field(description="Approximate mean +/- 2 SE band [dB]; not a validated confidence interval.")
+    provenance: ProvenanceLabel = "simulated"
+
+
+class LossBreakdownOut(BaseModel):
+    temporal: dict[str, LossEstimateOut]
+    spatial: dict[str, LossEstimateOut]
+    clock_variance_fraction: float
+    rms_relative_time_error_s: dict[str, float]
+
+
+class SweepOptionOut(BaseModel):
+    name: str
+    label: str
+    unit: str
+    kind: Literal["numeric", "categorical"]
+    minimum: float | None = None
+    maximum: float | None = None
+    default_values: list[float | str]
+    note: str
+
+
+class SensitivityOptionsOut(BaseModel):
+    parameters: list[SweepOptionOut]
+    limits: dict[str, float]
+    requirement_defaults: dict[str, float | int | str]
+    uncertainty_note: str
+
+
+class SweepRequest(ApiModel):
+    scenario_keys: list[str] = Field(min_length=1, max_length=4)
+    config: NetworkConfigIn = Field(default_factory=NetworkConfigIn)
+    parameter: SweepParameter
+    values: list[float | str] = Field(min_length=2, max_length=SWEEP_MAX_VALUES)
+
+    @model_validator(mode="after")
+    def _check(self) -> "SweepRequest":
+        ScenarioSelection(scenario_keys=self.scenario_keys)
+        from app.services.sensitivity import validate_sweep
+
+        validate_sweep(self)
+        return self
+
+
+class SweepSeriesOut(BaseModel):
+    scenario_key: str
+    label: str
+    values: list[float | str]
+    points: list[LossBreakdownOut]
+    monotonic_check: str | None = Field(description="Result of the monotonicity check where a direction is expected.")
+
+
+class SweepOut(BaseModel):
+    parameter: SweepParameter
+    unit: str
+    series: list[SweepSeriesOut]
+    config_parameters: dict[str, QuantityOut]
+    n_monte_carlo: int
+    seed: int
+    loss_ceiling_temporal_db: list[float]
+    loss_ceiling_spatial_db: list[float]
+    notes: list[str]
+
+
+class RequirementRequest(ApiModel):
+    base_scenario_keys: list[str] = Field(min_length=1, max_length=4)
+    config: NetworkConfigIn = Field(default_factory=NetworkConfigIn)
+    metric: CoherenceMetric = "spatial"
+    target_loss_db: float = Field(1.0, gt=0, le=30)
+    adev_1s_min: float = Field(1e-17, ge=1e-20, le=1e-6, description="Smallest sigma_y(1 s) of the scaled clock to evaluate.")
+    adev_1s_max: float = Field(1e-8, ge=1e-19, le=1e-5, description="Largest sigma_y(1 s) of the scaled clock to evaluate.")
+    n_grid: int = Field(13, ge=5, le=25)
+    refine_steps: int = Field(8, ge=0, le=12)
+
+    @model_validator(mode="after")
+    def _check(self) -> "RequirementRequest":
+        if len(set(self.base_scenario_keys)) != len(self.base_scenario_keys):
+            raise ValueError("base_scenario_keys must be unique")
+        if not self.adev_1s_max > self.adev_1s_min * 1.0001:
+            raise ValueError("adev_1s_max must be greater than adev_1s_min")
+        from app.services.sensitivity import validate_requirement
+
+        validate_requirement(self)
+        return self
+
+
+class RequirementPointOut(BaseModel):
+    adev_1s: float
+    scale: float
+    total: LossEstimateOut
+    clock_only: LossEstimateOut
+    non_clock_only: LossEstimateOut
+    clock_variance_fraction: float
+
+
+class RequirementOut(BaseModel):
+    base_scenario_key: str
+    label: str
+    base_category: ProvenanceLabel
+    base_adev_1s: float
+    status: Literal["determined", "infeasible_non_clock_floor", "not_reached_in_range",
+                    "not_binding_in_range", "ambiguous_non_monotonic"]
+    required_adev_1s: float | None = Field(description="Largest evaluated sigma_y(1 s) meeting the target (conservative); "
+                                           "a modelled requirement, not a device capability.")
+    crossing_adev_1s: float | None
+    approximate_bracket_adev_1s: tuple[float | None, float | None] | None
+    required_adev_at_tau: dict[str, float] | None = Field(description="Scaled ADEV of the base shape at system averaging times.")
+    floor: LossEstimateOut
+    base_clock_at_scale_1: LossBreakdownOut
+    curve: list[RequirementPointOut]
+    monotonic_violations: list[int]
+    messages: list[str]
+    warnings: list[str]
+    provenance: ProvenanceLabel = "simulated"
+
+
+class RequirementsOut(BaseModel):
+    metric: CoherenceMetric
+    target_loss_db: float
+    loss_ceiling_db: float
+    results: list[RequirementOut]
+    references: list[SourcedPointOut] = Field(description="Sourced and hypothetical sigma_y(1 s) reference values for context.")
+    config_parameters: dict[str, QuantityOut]
+    n_monte_carlo: int
+    seed: int
+    uncertainty_note: str
+    notes: list[str]

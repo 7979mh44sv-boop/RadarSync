@@ -15,6 +15,15 @@ export interface LineSeries {
   emphasis?: boolean[];
   width?: number;
   opacity?: number;
+  /** Optional uncertainty band drawn as a faint area (same x as the line). */
+  band?: { lo: number[]; hi: number[] };
+}
+
+export interface RefLine {
+  value: number;
+  label: string;
+  color: string;
+  dash?: string;
 }
 
 export interface PointSeries {
@@ -49,6 +58,10 @@ export interface LineChartProps {
   symmetricY?: boolean;
   /** Fixed y-domain (e.g. shared across small multiples). */
   yDomain?: [number, number];
+  /** Labelled horizontal reference lines (e.g. target, floor). */
+  hLines?: RefLine[];
+  /** Labelled vertical reference lines (e.g. sourced or hypothetical reference values). */
+  xRefs?: RefLine[];
 }
 
 const M = { top: 14, right: 18, bottom: 46, left: 74 };
@@ -89,8 +102,12 @@ export default function LineChart(props: LineChartProps) {
   const [hover, setHover] = useState<number | null>(null);
 
   const geom = useMemo(() => {
-    const xs = [...lines.flatMap((l) => l.x), ...points.flatMap((p) => p.x)];
-    const ys = [...lines.flatMap((l) => l.y), ...points.flatMap((p) => p.y)];
+    const xs = [...lines.flatMap((l) => l.x), ...points.flatMap((p) => p.x), ...(props.xRefs ?? []).map((r) => r.value)];
+    const ys = [
+      ...lines.flatMap((l) => [...l.y, ...(l.band ? [...l.band.lo, ...l.band.hi] : [])]),
+      ...points.flatMap((p) => p.y),
+      ...(props.hLines ?? []).map((h) => h.value),
+    ];
     const xd = extent(xs, xScale);
     if (xScale === "linear" && xs.length) {
       xd[0] = Math.min(...xs);
@@ -110,7 +127,7 @@ export default function LineChart(props: LineChartProps) {
       xTicks: xScale === "log" ? logTicks(xd[0], xd[1]) : linearTicks(xd[0], xd[1], Math.max(3, Math.floor(iw / 90))),
       yTicks: yScale === "log" ? logTicks(yd[0], yd[1]) : linearTicks(yd[0], yd[1], 5),
     };
-  }, [lines, points, xScale, yScale, width, height, props.symmetricY, props.yDomain]);
+  }, [lines, points, xScale, yScale, width, height, props.symmetricY, props.yDomain, props.hLines, props.xRefs]);
 
   const primary = lines[0];
   const fmtX = props.xTickFormat ?? (xScale === "log" ? pow10 : (v: number) => String(v));
@@ -167,6 +184,40 @@ export default function LineChart(props: LineChartProps) {
             <g clipPath={`url(#${clipId})`}>
               {(props.verticalMarkers ?? []).map((v) => (
                 <line key={`v${v}`} x1={geom.sx(v)} x2={geom.sx(v)} y1={0} y2={geom.ih} stroke="#33445e" strokeDasharray="2 4" />
+              ))}
+              {lines.map((l) =>
+                l.band ? (
+                  <path
+                    key={`${l.id}-band`}
+                    d={`M${l.x.map((x, i) => `${geom.sx(x)} ${geom.sy(l.band!.hi[i])}`).join("L")}L${l.x
+                      .map((x, i) => `${geom.sx(x)} ${geom.sy(l.band!.lo[i])}`)
+                      .reverse()
+                      .join("L")}Z`}
+                    fill={l.color}
+                    fillOpacity={0.14}
+                  />
+                ) : null,
+              )}
+              {(props.hLines ?? []).map((h) => (
+                <g key={`h-${h.label}`}>
+                  <line x1={0} x2={geom.iw} y1={geom.sy(h.value)} y2={geom.sy(h.value)} stroke={h.color} strokeWidth={1.5} strokeDasharray={h.dash} />
+                  <text x={geom.iw - 4} y={geom.sy(h.value) - 5} textAnchor="end" className="text-[10.5px]" fill={h.color}>{h.label}</text>
+                </g>
+              ))}
+              {(props.xRefs ?? []).map((r, k) => (
+                <g key={`x-${r.label}`}>
+                  <line x1={geom.sx(r.value)} x2={geom.sx(r.value)} y1={0} y2={geom.ih} stroke={r.color} strokeWidth={1.25} strokeDasharray={r.dash} />
+                  {/* Labels sit near the bottom (away from top-right reference labels) and flip left near the right edge. */}
+                  <text
+                    x={geom.sx(r.value) + (geom.sx(r.value) > geom.iw * 0.6 ? -4 : 4)}
+                    y={geom.ih - 8 - 14 * k}
+                    textAnchor={geom.sx(r.value) > geom.iw * 0.6 ? "end" : "start"}
+                    className="text-[10.5px]"
+                    fill={r.color}
+                  >
+                    {r.label}
+                  </text>
+                </g>
               ))}
               {lines.map((l) =>
                 l.x.slice(1).map((_, i) => {
