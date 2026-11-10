@@ -13,8 +13,11 @@ noise         Power-law fractional-frequency noise generators.
 clock         Clock noise model: y(t), time error x(t), phase error phi(t).
 stability     Overlapping Allan deviation estimator.
 scenarios     OCXO / existing CSAC (SA65) / hypothetical NextGen CSAC.
-
-Planned (not implemented): distribution, architectures, radar, sensitivity.
+timing_errors Non-clock timing-error terms and the synchronisation configuration.
+network       Multi-node clock + non-clock errors with synchronisation corrections.
+coherence     Coherent-integration gain and analytical expectations.
+radar         Relative time/phase error and coherent loss metrics; scenario comparison.
+consistency   Model-implied phase noise vs. sourced SA65 limits.
 """
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"

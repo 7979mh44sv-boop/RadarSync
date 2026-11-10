@@ -8,9 +8,10 @@ It investigates whether a chip-scale atomic clock (CSAC) with a breakthrough sho
 stability of **ADEV < 1 × 10⁻¹⁵ at τ = 1 s** (otherwise Microchip SA65 reference specs)
 creates measurable, system-level value in **distributed radar**.
 
-> **Project status:** the clock noise model (time/phase error, Allan deviation, clock scenarios)
-> is implemented and numerically validated. The radar system model is **not implemented yet**,
-> and this repository makes **no radar performance claims** at this stage.
+> **Project status:** the clock noise model (Phase 1) and the multi-node radar synchronisation
+> and timing-error model (Phase 2: relative time/phase error, coherent integration loss) are
+> implemented and numerically validated. All system parameters are assumptions and all results
+> are simulated. The repository makes **no detection-range, RCS or operational performance claims**.
 
 ## Validation principles (from the challenge brief)
 
@@ -24,7 +25,10 @@ The simulation is designed to satisfy the challenge's *Validation evidence* crit
 - Keep **sourced inputs**, **engineering assumptions** and **simulated outputs** strictly separate
   (enforced via `backend/radarsync_sim/provenance.py`).
 
-The clock noise model is documented in [docs/clock_noise_model.md](docs/clock_noise_model.md).
+Model documentation:
+[docs/clock_noise_model.md](docs/clock_noise_model.md) (Phase 1) ·
+[docs/radar_timing_model.md](docs/radar_timing_model.md) (Phase 2).
+Regenerate the Phase 2 results with `cd backend && .venv/bin/python scripts/phase2_report.py`.
 
 ## Repository layout
 
@@ -41,7 +45,13 @@ radarsync/
 │   │   ├── noise.py          White / flicker / random-walk FM generators
 │   │   ├── clock.py          y(t), time error x(t), phase error phi(t)
 │   │   ├── stability.py      Overlapping Allan deviation
-│   │   └── scenarios.py      OCXO, SA65, hypothetical NextGen CSAC
+│   │   ├── scenarios.py      OCXO, SA65, hypothetical NextGen CSAC
+│   │   ├── timing_errors.py  Non-clock error terms, sync configuration
+│   │   ├── network.py        Multi-node timing with synchronisation
+│   │   ├── coherence.py      Coherent gain + analytical expectations
+│   │   ├── radar.py          Relative time/phase error, coherent loss, comparisons
+│   │   └── consistency.py    Model-implied phase noise vs. SA65 limits
+│   ├── scripts/              Reproducible reports (phase2_report.py)
 │   ├── tests/                pytest suite (tests/sim: numerical validation)
 │   └── requirements.txt
 ├── frontend/                 Next.js 16 (App Router) + TypeScript + Tailwind CSS v4
