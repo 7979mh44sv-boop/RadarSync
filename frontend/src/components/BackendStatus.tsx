@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { API_BASE_URL, fetchHealth, type HealthResponse } from "@/lib/api";
+import { fetchHealth, type HealthResponse } from "@/lib/api";
 
 type State =
   | { kind: "loading" }
@@ -10,12 +10,12 @@ type State =
 
 const POLL_INTERVAL_MS = 10_000;
 
+/** Compact backend link indicator for the header. */
 export default function BackendStatus() {
   const [state, setState] = useState<State>({ kind: "loading" });
 
   useEffect(() => {
     let controller: AbortController | null = null;
-
     async function check() {
       controller?.abort();
       controller = new AbortController();
@@ -28,7 +28,6 @@ export default function BackendStatus() {
         setState({ kind: "offline", error: (err as Error).message });
       }
     }
-
     check();
     const id = setInterval(check, POLL_INTERVAL_MS);
     return () => {
@@ -37,54 +36,22 @@ export default function BackendStatus() {
     };
   }, []);
 
-  const dot =
-    state.kind === "online" ? "bg-accent" : state.kind === "offline" ? "bg-danger" : "bg-warning";
-  const label =
-    state.kind === "online" ? "Online" : state.kind === "offline" ? "Unreachable" : "Connecting";
+  const dot = state.kind === "online" ? "bg-accent" : state.kind === "offline" ? "bg-danger" : "bg-warning";
+  const label = state.kind === "online" ? "Engine online" : state.kind === "offline" ? "Engine unreachable" : "Connecting";
+  const detail =
+    state.kind === "online"
+      ? `sim v${state.data.simulation_version} · ${state.latencyMs.toFixed(0)} ms`
+      : state.kind === "offline"
+        ? "start backend on :8000"
+        : "";
 
   return (
-    <section
-      aria-live="polite"
-      className="rounded-2xl border border-border bg-surface/80 p-6 backdrop-blur"
-    >
-      <header className="flex items-center justify-between">
-        <h2 className="text-xs font-medium uppercase tracking-[0.2em] text-muted">
-          Simulation Engine Link
-        </h2>
-        <span className="flex items-center gap-2 text-sm">
-          <span className={`relative inline-flex h-2.5 w-2.5 rounded-full ${dot}`}>
-            {state.kind === "online" && (
-              <span className="absolute inset-0 animate-ping rounded-full bg-accent opacity-60" />
-            )}
-          </span>
-          {label}
-        </span>
-      </header>
-
-      <dl className="mt-5 grid grid-cols-2 gap-x-6 gap-y-3 font-mono text-sm">
-        <dt className="text-muted">Endpoint</dt>
-        <dd className="truncate text-right">{API_BASE_URL}/health</dd>
-        {state.kind === "online" && (
-          <>
-            <dt className="text-muted">Service</dt>
-            <dd className="text-right">
-              {state.data.service} v{state.data.version}
-            </dd>
-            <dt className="text-muted">Round-trip</dt>
-            <dd className="text-right">{state.latencyMs.toFixed(1)} ms</dd>
-            <dt className="text-muted">NumPy / SciPy</dt>
-            <dd className="text-right">
-              {state.data.numpy_version} / {state.data.scipy_version}
-            </dd>
-          </>
-        )}
-        {state.kind === "offline" && (
-          <dd className="col-span-2 text-danger">
-            {state.error}. Start the backend with{" "}
-            <code className="text-foreground">uvicorn app.main:app --reload</code>.
-          </dd>
-        )}
-      </dl>
-    </section>
+    <div aria-live="polite" className="flex items-center gap-2 rounded-full border border-border bg-surface/80 px-3 py-1.5 text-xs" title={state.kind === "offline" ? state.error : undefined}>
+      <span className={`relative inline-flex h-2 w-2 rounded-full ${dot}`}>
+        {state.kind === "online" && <span className="absolute inset-0 animate-ping rounded-full bg-accent opacity-60" />}
+      </span>
+      <span>{label}</span>
+      {detail && <span className="font-mono text-muted">{detail}</span>}
+    </div>
   );
 }

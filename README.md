@@ -55,10 +55,11 @@ radarsync/
 │   ├── tests/                pytest suite (tests/sim: numerical validation)
 │   └── requirements.txt
 ├── frontend/                 Next.js 16 (App Router) + TypeScript + Tailwind CSS v4
-│   └── src/
-│       ├── app/              Layout, page, global theme
-│       ├── components/       BackendStatus (live /health), RadarScope (decorative)
-│       └── lib/api.ts        Typed API client
+│   ├── src/
+│   │   ├── app/              Layout, page, global theme
+│   │   ├── components/       Dashboard, panels (clock, timing, coherence, controls, provenance), SVG charts
+│   │   └── lib/              Typed API client, formatting/scales, scenario styles
+│   └── tests/                node:test unit tests + live-API render integration test
 ├── docs/                     Documentation and reports
 └── .env.example
 ```
@@ -95,11 +96,29 @@ The landing page shows a live **Simulation Engine Link** panel that polls `GET /
 every 10 s. To point it at another backend, set `NEXT_PUBLIC_API_BASE_URL` in
 `frontend/.env.local` (see `.env.example`).
 
+### Simulation API (v1)
+
+The FastAPI layer (`backend/app/api/simulation.py`, models in `backend/app/schemas.py`) is a thin adapter
+over `radarsync_sim`; it contains no physics. Interactive documentation: http://localhost:8000/docs
+
+| Method | Path | Purpose |
+|---|---|---|
+| GET | `/api/v1/scenarios` | Clock scenarios with per-parameter provenance, SA65 datasheet ADEV points, NextGen target |
+| GET | `/api/v1/parameters` | Configurable parameters, allowed ranges, computation limits and rules |
+| GET | `/api/v1/limitations` | Model limitations and the SA65 phase-noise consistency check |
+| POST | `/api/v1/clock/adev` | Analytic ADEV curves (constrained range flagged) and simulated overlapping ADEV |
+| POST | `/api/v1/network/timing` | Relative timing-error time series for a node pair (clock vs. non-clock) |
+| POST | `/api/v1/radar/coherence` | Temporal and spatial coherent-integration loss per scenario (Monte Carlo) |
+
+Requests are validated (node count, carrier frequency, durations, sync interval, seeds, array sizes) and
+bounded by a computation budget; invalid requests return HTTP 422 with a readable message.
+
 ### Tests and checks
 
 ```bash
 cd backend && .venv/bin/pytest -q     # backend tests
-cd frontend && npm run lint && npm run build
+cd frontend && npm run lint && npm run typecheck && npm test && npm run build
+cd frontend && npm run test:integration   # renders dashboard panels with live API data (backend must be running)
 ```
 
 ## License
