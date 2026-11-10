@@ -8,8 +8,9 @@ It investigates whether a chip-scale atomic clock (CSAC) with a breakthrough sho
 stability of **ADEV < 1 × 10⁻¹⁵ at τ = 1 s** (otherwise Microchip SA65 reference specs)
 creates measurable, system-level value in **distributed radar**.
 
-> **Project status:** technical foundation only. The physical model is **not implemented
-> yet**, and this repository makes **no simulation claims** at this stage.
+> **Project status:** the clock noise model (time/phase error, Allan deviation, clock scenarios)
+> is implemented and numerically validated. The radar system model is **not implemented yet**,
+> and this repository makes **no radar performance claims** at this stage.
 
 ## Validation principles (from the challenge brief)
 
@@ -21,25 +22,27 @@ The simulation is designed to satisfy the challenge's *Validation evidence* crit
 - Run **sensitivity analyses**: when is the clock the limiting factor, and what is the minimum
   clock performance actually required?
 - Keep **sourced inputs**, **engineering assumptions** and **simulated outputs** strictly separate
-  (enforced via `backend/app/simulation/parameters.py`).
+  (enforced via `backend/radarsync_sim/provenance.py`).
+
+The clock noise model is documented in [docs/clock_noise_model.md](docs/clock_noise_model.md).
 
 ## Repository layout
 
 ```
 radarsync/
 ├── backend/                  FastAPI service + simulation engine (Python)
-│   ├── app/
+│   ├── app/                  FastAPI web layer (no physics)
 │   │   ├── main.py           FastAPI app, CORS
 │   │   ├── config.py         Settings from environment (RADARSYNC_*)
-│   │   ├── api/health.py     GET /health
-│   │   └── simulation/       Scientific model (scaffold)
-│   │       ├── parameters.py   Inputs with provenance (sourced / assumption / simulated)
-│   │       ├── clock.py        Oscillator noise models            [planned]
-│   │       ├── distribution.py Noise beyond the clock             [planned]
-│   │       ├── architectures.py Baseline vs. competing designs    [planned]
-│   │       ├── radar.py        Timing error → radar metrics       [planned]
-│   │       └── sensitivity.py  Parameter sweeps                   [planned]
-│   ├── tests/                pytest suite
+│   │   └── api/health.py     GET /health
+│   ├── radarsync_sim/        Simulation engine (NumPy/SciPy only, no web imports)
+│   │   ├── provenance.py     SOURCED / ASSUMPTION / HYPOTHETICAL_TARGET / SIMULATED labels
+│   │   ├── parameters.py     Sourced reference data (SA65 datasheet, challenge brief)
+│   │   ├── noise.py          White / flicker / random-walk FM generators
+│   │   ├── clock.py          y(t), time error x(t), phase error phi(t)
+│   │   ├── stability.py      Overlapping Allan deviation
+│   │   └── scenarios.py      OCXO, SA65, hypothetical NextGen CSAC
+│   ├── tests/                pytest suite (tests/sim: numerical validation)
 │   └── requirements.txt
 ├── frontend/                 Next.js 16 (App Router) + TypeScript + Tailwind CSS v4
 │   └── src/
