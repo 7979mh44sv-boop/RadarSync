@@ -1,0 +1,11 @@
+# Runtime
+fastapi==0.162.4
+uvicorn[standard]==0.54.0
+numpy==2.5.4
+scipy==1.18.1
+pydantic==2.14.3
+pydantic-settings==2.16.2
+
+# Development / testing
+pytest==9.2.0
+httpx2==2.16.0
