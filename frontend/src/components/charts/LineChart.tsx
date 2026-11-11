@@ -158,7 +158,7 @@ export default function LineChart(props: LineChartProps) {
             {/* grid + axes (recessive) */}
             {geom.yTicks.map((t) => (
               <g key={`y${t}`}>
-                <line x1={0} x2={geom.iw} y1={geom.sy(t)} y2={geom.sy(t)} stroke="#1a2638" strokeWidth={1} />
+                <line x1={0} x2={geom.iw} y1={geom.sy(t)} y2={geom.sy(t)} stroke="#dceaf4" strokeWidth={1} />
                 <text x={-8} y={geom.sy(t)} dy="0.32em" textAnchor="end" className="fill-muted font-mono text-[11px]">
                   {fmtY(t)}
                 </text>
@@ -166,14 +166,14 @@ export default function LineChart(props: LineChartProps) {
             ))}
             {geom.xTicks.map((t) => (
               <g key={`x${t}`}>
-                <line x1={geom.sx(t)} x2={geom.sx(t)} y1={0} y2={geom.ih} stroke="#1a2638" strokeWidth={1} />
+                <line x1={geom.sx(t)} x2={geom.sx(t)} y1={0} y2={geom.ih} stroke="#dceaf4" strokeWidth={1} />
                 <text x={geom.sx(t)} y={geom.ih + 18} textAnchor="middle" className="fill-muted font-mono text-[11px]">
                   {fmtX(t)}
                 </text>
               </g>
             ))}
-            <line x1={0} x2={geom.iw} y1={geom.ih} y2={geom.ih} stroke="#33445e" />
-            <line x1={0} x2={0} y1={0} y2={geom.ih} stroke="#33445e" />
+            <line x1={0} x2={geom.iw} y1={geom.ih} y2={geom.ih} stroke="#9fb6cc" />
+            <line x1={0} x2={0} y1={0} y2={geom.ih} stroke="#9fb6cc" />
             <text x={geom.iw / 2} y={geom.ih + 40} textAnchor="middle" className="fill-foreground/80 text-[12px]">
               {props.xLabel}
             </text>
@@ -183,7 +183,7 @@ export default function LineChart(props: LineChartProps) {
 
             <g clipPath={`url(#${clipId})`}>
               {(props.verticalMarkers ?? []).map((v) => (
-                <line key={`v${v}`} x1={geom.sx(v)} x2={geom.sx(v)} y1={0} y2={geom.ih} stroke="#33445e" strokeDasharray="2 4" />
+                <line key={`v${v}`} x1={geom.sx(v)} x2={geom.sx(v)} y1={0} y2={geom.ih} stroke="#9fb6cc" strokeDasharray="2 4" />
               ))}
               {lines.map((l) =>
                 l.band ? (
@@ -240,8 +240,8 @@ export default function LineChart(props: LineChartProps) {
                   <path
                     key={`${p.id}-${i}`}
                     d={markerPath(p.shape, geom.sx(x), geom.sy(p.y[i]), p.size ?? 4.5)}
-                    fill={p.hollow ? "#0a111c" : p.color}
-                    stroke={p.hollow ? p.color : "#0a111c"}
+                    fill={p.hollow ? "#ffffff" : p.color}
+                    stroke={p.hollow ? p.color : "#ffffff"}
                     strokeWidth={p.hollow ? 2 : 1.5}
                   >
                     {p.titles?.[i] && <title>{p.titles[i]}</title>}
@@ -249,7 +249,7 @@ export default function LineChart(props: LineChartProps) {
                 )),
               )}
               {hx !== null && (
-                <line x1={geom.sx(hx)} x2={geom.sx(hx)} y1={0} y2={geom.ih} stroke="#e6edf7" strokeOpacity={0.5} />
+                <line x1={geom.sx(hx)} x2={geom.sx(hx)} y1={0} y2={geom.ih} stroke="#163a63" strokeOpacity={0.45} />
               )}
             </g>
             <rect
@@ -264,7 +264,7 @@ export default function LineChart(props: LineChartProps) {
       )}
       {hx !== null && hover !== null && (
         <div
-          className="pointer-events-none absolute z-10 min-w-48 rounded-lg border border-border bg-[#0d1522]/95 px-3 py-2 font-mono text-[11px] shadow-xl"
+          className="pointer-events-none absolute z-10 min-w-48 rounded-lg border border-border bg-white/95 px-3 py-2 font-mono text-[11px] shadow-xl"
           style={{
             left: Math.min(M.left + geom.sx(hx) + 12, Math.max(0, width - 230)),
             top: M.top + 8,

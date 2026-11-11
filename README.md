@@ -1,6 +1,6 @@
 # RadarSync
 
-**One Constellation. One Coherent Radar.** The precision timing backbone for distributed satellite radar.
+**One Constellation. One Radar.** The precision timing backbone for distributed satellite radar.
 
 RadarSync is a scientific simulation and web dashboard built for the
 **NextSemi Deep-Tech Hackathon** (imec.xpand *Chip-Scale Atomic Clock Venture Challenge*).
@@ -28,19 +28,19 @@ inter-satellite link, SAR image formation, radiation or space qualification, and
 
 ## 2-minute live demo script
 
-Start both services (see *Quick start*) and open http://localhost:3000.
+Start both services (see *Quick start*) and open http://localhost:3000. The site has six pages:
+`/` (home), `/why-us`, `/product`, `/science` (live demo and panels A–G), `/market`, `/roadmap`.
 
-1. **0:00 Hero (15 s).** "One Constellation. One Coherent Radar." Point to the conceptual Timing Box and say the hardware is proposed, not built.
-2. **0:15 Product (20 s).** Scroll to *RadarSync Timing Box*: the four proposed components and the conceptual satellite integration diagram.
-3. **0:35 Key insight (25 s).** Live requirement solver: the clock stability a 1 dB spatial-coherence target needs, where non-clock errors take
-   over, and the SA65 model vs. the hypothetical NextGen CSAC. All values are labelled SIMULATED.
-4. **1:00 Live demo (30 s).** Click the preset *Long holdover: 10 s sync*, then panel C (coherence) and panel G with *Synchronisation interval*:
+1. **0:00 Home (15 s).** "One Constellation. One Radar." and the five-point summary (what, for whom, why, proof, status).
+2. **0:15 Why → /why-us (15 s).** Many satellites, many clocks: they must agree on time and phase.
+3. **0:30 Product → /product (20 s).** The Timing Box concept render (labelled: hardware not yet built), its architecture and the satellite integration diagram.
+4. **0:50 Science → /science (40 s).** Key insight (live requirement solver), then the preset *Long holdover: 10 s sync* and panels C and G:
    weaker clocks lose coherence as satellites re-synchronise less often; the benefit is conditional on clock error dominating.
-5. **1:30 Value chain and evidence (20 s).** Research → customer problem → hardware capability → simulated evidence → buyer benefit →
-   remaining validation, then *What we have validated / what remains unproven*.
-6. **1:50 Roadmap (10 s).** Five stages from proof of concept to space qualification, plus engineering risks and mitigations.
+5. **1:30 Market → /market (20 s).** Buyer hypotheses, the value chain with live simulated values, the Business Model Canvas
+   (proposed, not customer-validated), the revenue model and the market-entry path — all qualitative, no figures.
+6. **1:50 Roadmap → /roadmap (10 s).** Five stages from proof of concept to space qualification, risks and the growth hypothesis.
 
-The page sections follow the presentation order: Part 1 Why us → Part 2 How → Part 3 What.
+Navigation order matches the presentation: Why → How (Product, Science) → What (Market, Roadmap).
 
 ## Validation principles (from the challenge brief)
 

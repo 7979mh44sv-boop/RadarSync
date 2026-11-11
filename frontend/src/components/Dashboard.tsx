@@ -170,12 +170,12 @@ export default function Dashboard() {
 
   return (
     <div className="mx-auto w-full max-w-7xl space-y-6 px-4 py-8 sm:px-6">
-      <Panel id="insight" eyebrow="Key insight" title="When does clock stability matter for satellite radar coherence?"
-        subtitle="Live result of the Phase 3 requirement solver at the default assumptions: 1 dB spatial coherence-loss target, every clock noise shape.">
+      <Panel id="insight" eyebrow="Key insight" title="When does the clock matter?"
+        subtitle="Live result for a 1 dB coherence-loss target, using default assumptions.">
         <KeyInsightPanel state={insight} config={insightConfig} />
       </Panel>
-      <Panel id="demo" eyebrow="Guided demo" title="Live demo: from clock stability to radar coherence"
-        subtitle="Jump to each panel, or apply a preset that sets the controls and runs the unchanged simulation.">
+      <Panel id="demo" eyebrow="Guided demo" title="Run the demo"
+        subtitle="Pick a preset or follow the five steps.">
         <GuidedDemo onPreset={applyPreset} activePreset={activePreset} running={coh.state === "loading"} />
       </Panel>
     <div className="grid w-full gap-6 lg:grid-cols-[300px_minmax(0,1fr)]">

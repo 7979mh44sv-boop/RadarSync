@@ -30,8 +30,8 @@ export default function CoherencePanel({ data, width }: { data: CoherenceRespons
         </span>
       </div>
       <Legend items={[
-        { id: "t", label: "Total", color: "#e6edf7", marker: "square" },
-        { id: "c", label: "Clock-induced only", color: "#e6edf7", marker: "hatch" },
+        { id: "t", label: "Total", color: "#163a63", marker: "square" },
+        { id: "c", label: "Clock-induced only", color: "#163a63", marker: "hatch" },
         { id: "n", label: "Non-clock only", color: NEUTRAL_SERIES, marker: "square" },
       ]} />
       <div className="grid gap-6 xl:grid-cols-2">

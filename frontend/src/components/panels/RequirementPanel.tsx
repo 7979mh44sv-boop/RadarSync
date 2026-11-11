@@ -9,8 +9,8 @@ import { formatDb, formatSci } from "@/lib/format";
 import { NEUTRAL_SERIES, styleFor } from "@/lib/scenarios";
 import { STATUS_INFO, clampForLog } from "@/lib/sensitivity";
 
-const SOURCED_REF = "#c3c9d4";
-const HYPOTHETICAL_REF = "#b4a7f5";
+const SOURCED_REF = "#475569";
+const HYPOTHETICAL_REF = "#7c3aed";
 const Y_FLOOR = 1e-3;
 
 const TONE: Record<string, string> = {
@@ -48,7 +48,7 @@ export function buildRequirementChart(data: RequirementsResponse) {
     }));
   const floor = Math.max(...data.results.map((r) => r.floor.loss_db));
   const hLines: RefLine[] = [
-    { value: data.target_loss_db, label: `Target ${formatDb(data.target_loss_db)}`, color: "#e6edf7", dash: "6 4" },
+    { value: data.target_loss_db, label: `Target ${formatDb(data.target_loss_db)}`, color: "#163a63", dash: "6 4" },
     { value: Math.max(floor, Y_FLOOR), label: `Non-clock floor ${formatDb(floor)} (simulated)`, color: NEUTRAL_SERIES, dash: "2 3" },
     { value: data.loss_ceiling_db, label: `Random-phase ceiling ${formatDb(data.loss_ceiling_db)}`, color: "#4a5d7a", dash: "1 4" },
   ];
@@ -135,7 +135,7 @@ export default function RequirementPanel({ data, width }: { data: RequirementsRe
       </div>
       <Legend items={[
         ...lines.map((l) => ({ id: l.id, label: l.label, color: l.color, dash: l.dash })),
-        { id: "req", label: "Modelled requirement (at target)", color: "#e6edf7", marker: "circle" as const, hollow: true },
+        { id: "req", label: "Modelled requirement (at target)", color: "#163a63", marker: "circle" as const, hollow: true },
         { id: "src", label: "Sourced reference", color: SOURCED_REF, dash: "5 3" },
         { id: "hyp", label: "Hypothetical reference", color: HYPOTHETICAL_REF, dash: "1 3" },
       ]} />

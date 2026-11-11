@@ -96,7 +96,7 @@ export default function Phase3Section({ config, scenarios, selected, maxSamples 
             <div className="flex flex-wrap gap-2">
               {allKeys.map((k) => (
                 <label key={k} className="flex items-center gap-1.5 rounded-md border border-border/70 px-2 py-1 text-xs">
-                  <input type="checkbox" className="accent-[#38e1c6]" checked={bases.includes(k)}
+                  <input type="checkbox" className="accent-[#2679b8]" checked={bases.includes(k)}
                     onChange={() => setBases((b) => (b.includes(k) ? b.filter((x) => x !== k) : allKeys.filter((x) => x === k || b.includes(x))))} />
                   <span className="inline-block h-2 w-2 rounded-full" style={{ background: styleFor(k).color }} />
                   {styleFor(k).short}

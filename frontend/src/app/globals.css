@@ -2,15 +2,19 @@
 
 /* RadarSync design tokens: dark aerospace theme. */
 :root {
-  --background: #04070d;
-  --foreground: #e6edf7;
-  --surface: #0a111c;
-  --border: #1a2638;
-  --muted: #7d8ba1;
-  --accent: #38e1c6; /* phosphor teal */
-  --accent-2: #5b8cff; /* signal blue */
-  --warning: #f5b544;
-  --danger: #ff5d6c;
+  /* Orbital Blue */
+  --background: #f5f8fc; /* Cloud White */
+  --foreground: #163a63; /* Orbital Navy */
+  --surface: #ffffff;
+  --border: #cfe0ec;
+  --muted: #4a6481; /* >= 5.5:1 on white */
+  --accent: #1d659c; /* Signal Blue, darkened for text (>= 4.5:1 on all light surfaces) */
+  --accent-2: #146a66; /* Aurora Teal, darkened for text (>= 4.5:1) */
+  --warning: #a35f00;
+  --danger: #c2312f;
+  --ice: #dceaf4;
+  --navy: #163a63;
+  --aurora: #2ab6b0;
 }
 
 @theme inline {
@@ -23,12 +27,17 @@
   --color-accent-2: var(--accent-2);
   --color-warning: var(--warning);
   --color-danger: var(--danger);
+  --color-ice: var(--ice);
+  --color-navy: var(--navy);
+  --color-cloud: var(--background);
+  --color-signal: var(--accent);
+  --color-aurora: var(--aurora);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 html {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 body {
@@ -62,3 +71,21 @@ body {
   }
 }
 
+
+html {
+  scroll-behavior: smooth;
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Roadmap finale: drifting constellation links and gently pulsing nodes. */
+@keyframes link-flow { to { stroke-dashoffset: -24; } }
+@keyframes node-pulse { 0%, 100% { opacity: 0.55; } 50% { opacity: 1; } }
+.link-flow { animation: link-flow 2.4s linear infinite; }
+.node-pulse { animation: node-pulse 3.2s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .link-flow, .node-pulse { animation: none; }
+}

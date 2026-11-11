@@ -10,13 +10,13 @@ import { useDefaultInsight } from "@/lib/defaultInsight";
 export const CHAIN_STEPS = ["Research", "Customer problem", "Hardware capability", "Simulated evidence", "Buyer benefit", "Remaining validation"] as const;
 type Kind = "sourced" | "simulated" | "hypothesis" | "proposed" | "gap";
 const KIND: Record<Kind, string> = {
-  sourced: "SOURCED", simulated: "SIMULATED", hypothesis: "HYPOTHESIS", proposed: "PROPOSED", gap: "GAP",
+  sourced: "SOURCED", simulated: "SIMULATED", hypothesis: "HYPOTHESIS", proposed: "PROPOSED", gap: "TO VALIDATE",
 };
 const KIND_CLS: Record<Kind, string> = {
-  sourced: "border-slate-300/60 text-slate-100",
+  sourced: "border-slate-300/60 text-slate-700",
   simulated: "border-accent/60 text-accent",
-  hypothesis: "border-dotted border-violet-300/70 text-violet-200",
-  proposed: "border-dashed border-slate-500 text-slate-300",
+  hypothesis: "border-dotted border-violet-500 text-violet-700",
+  proposed: "border-dashed border-slate-400 text-slate-600",
   gap: "border-warning/60 text-warning",
 };
 
@@ -77,35 +77,41 @@ export function buildValueChain(data: RequirementsResponse): ChainRow[] {
 
 export function ValueChainContent({ data }: { data: RequirementsResponse }) {
   const rows = buildValueChain(data);
+  const Pill = ({ kind }: { kind: Kind }) => (
+    <span className={`inline-flex rounded-full border px-1.5 py-0.5 font-mono text-[9.5px] tracking-wider ${KIND_CLS[kind]}`}>{KIND[kind]}</span>
+  );
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-2 text-xs text-muted">
+      <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500">
         <ProvenanceBadge kind="simulated" />
-        <span>Simulated cells are filled live from the requirement solver at the default assumptions. Hypotheses are not evidence.</span>
+        <span>Simulated values come live from our requirement solver. Every step is labelled by evidence type.</span>
       </div>
-      <ol className="hidden grid-cols-6 gap-2 lg:grid" aria-hidden>
-        {CHAIN_STEPS.map((s, i) => (
-          <li key={s} className="flex items-center gap-1 font-mono text-[11px] uppercase tracking-wider text-accent">
-            {s}{i < CHAIN_STEPS.length - 1 && <span className="text-muted">→</span>}
-          </li>
-        ))}
-      </ol>
-      {rows.map((r) => (
-        <div key={r.title} className="rounded-xl border border-border bg-background/30 p-3">
-          <h3 className="mb-2 text-sm font-medium">{r.title}</h3>
-          <ol className="grid gap-2 sm:grid-cols-2 lg:grid-cols-6">
-            {r.cells.map((c, i) => (
-              <li key={i} className="rounded-lg border border-border/60 bg-background/40 p-2.5">
-                <div className="flex flex-wrap items-center justify-between gap-1">
-                  <span className="font-mono text-[10px] uppercase tracking-wider text-muted lg:hidden">{CHAIN_STEPS[i]}</span>
-                  <span className={`inline-flex rounded-full border px-1.5 py-0.5 font-mono text-[9.5px] tracking-wider ${KIND_CLS[c.kind]}`}>{KIND[c.kind]}</span>
-                </div>
-                <p className="mt-1.5 text-[11.5px] leading-relaxed text-foreground/85">{c.text}</p>
-              </li>
-            ))}
-          </ol>
-        </div>
-      ))}
+      <div className="grid gap-4 md:grid-cols-2">
+        {rows.map((r) => {
+          const evidence = r.cells.find((c) => c.kind === "simulated")!;
+          const gap = r.cells[r.cells.length - 1];
+          return (
+            <article key={r.title} className="rounded-2xl border border-ice bg-white p-5 transition-colors hover:border-accent/40">
+              <h3 className="text-base font-semibold text-navy">{r.title}</h3>
+              <div className="mt-3 space-y-2 text-sm leading-relaxed">
+                <p className="text-slate-700"><Pill kind={evidence.kind} /> <span className="ml-1">{evidence.text}</span></p>
+                <p className="text-slate-600"><Pill kind={gap.kind} /> <span className="ml-1">{gap.text}</span></p>
+              </div>
+              <details className="mt-3 text-xs text-slate-500">
+                <summary className="cursor-pointer text-slate-600 hover:text-navy">Full chain: research → buyer benefit → validation</summary>
+                <ol className="mt-2 space-y-1.5">
+                  {r.cells.map((c, i) => (
+                    <li key={i} className="flex gap-2">
+                      <span className="w-36 shrink-0 font-mono text-[10px] uppercase tracking-wider text-slate-500">{CHAIN_STEPS[i]}</span>
+                      <span><Pill kind={c.kind} /> <span className="ml-1 text-slate-600">{c.text}</span></span>
+                    </li>
+                  ))}
+                </ol>
+              </details>
+            </article>
+          );
+        })}
+      </div>
     </div>
   );
 }

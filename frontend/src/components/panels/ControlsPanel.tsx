@@ -64,7 +64,7 @@ export default function ControlsPanel({ params, scenarios, selected, onToggle, c
         <div className="mt-2 space-y-2">
           {scenarios.map((s) => (
             <label key={s.key} className="flex cursor-pointer items-start gap-2.5 rounded-lg border border-border/70 px-3 py-2 hover:border-border">
-              <input type="checkbox" className="mt-1 accent-[#38e1c6]" checked={selected.includes(s.key)} onChange={() => onToggle(s.key)} />
+              <input type="checkbox" className="mt-1 accent-[#2679b8]" checked={selected.includes(s.key)} onChange={() => onToggle(s.key)} />
               <span className="min-w-0 flex-1">
                 <span className="flex items-center gap-2 text-sm">
                   <svg width="18" height="8" aria-hidden><line x1="1" y1="4" x2="17" y2="4" stroke={styleFor(s.key).color} strokeWidth="3" strokeDasharray={styleFor(s.key).dash ? "4 3" : undefined} /></svg>
@@ -96,7 +96,7 @@ export default function ControlsPanel({ params, scenarios, selected, onToggle, c
       </Field>
 
       <Field label={`Satellite radar nodes: ${config.n_nodes}`} hint={`${nMin}–${nMax}`}>
-        <input type="range" min={nMin} max={nMax} step={1} value={config.n_nodes} className="w-full accent-[#38e1c6]"
+        <input type="range" min={nMin} max={nMax} step={1} value={config.n_nodes} className="w-full accent-[#2679b8]"
           onChange={(e) => onChange({ n_nodes: Number(e.target.value) })} />
       </Field>
 
@@ -151,7 +151,7 @@ export default function ControlsPanel({ params, scenarios, selected, onToggle, c
             );
           })}
           <Field label={`Clock correlation ρ: ${config.clock_correlation.toFixed(2)}`} hint="common-mode fraction">
-            <input type="range" min={0} max={1} step={0.05} value={config.clock_correlation} className="w-full accent-[#38e1c6]"
+            <input type="range" min={0} max={1} step={0.05} value={config.clock_correlation} className="w-full accent-[#2679b8]"
               onChange={(e) => onChange({ clock_correlation: Number(e.target.value) })} />
           </Field>
           <div className="grid grid-cols-2 gap-3">

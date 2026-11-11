@@ -60,7 +60,7 @@ export default function LossBars({ rows, ceilingDb, ariaLabel, width: fixedWidth
           <g transform={`translate(${M.left},${M.top})`}>
             {ticks.map((t) => (
               <g key={t}>
-                <line x1={sx(t)} x2={sx(t)} y1={0} y2={ih} stroke="#1a2638" />
+                <line x1={sx(t)} x2={sx(t)} y1={0} y2={ih} stroke="#dceaf4" />
                 <text x={sx(t)} y={ih + 16} textAnchor="middle" className="fill-muted font-mono text-[11px]">{t}</text>
               </g>
             ))}
@@ -69,7 +69,7 @@ export default function LossBars({ rows, ceilingDb, ariaLabel, width: fixedWidth
             </text>
             {showCeiling && (
               <g>
-                <line x1={sx(ceilingDb)} x2={sx(ceilingDb)} y1={-2} y2={ih} stroke="#e6edf7" strokeOpacity={0.45} strokeDasharray="4 4" />
+                <line x1={sx(ceilingDb)} x2={sx(ceilingDb)} y1={-2} y2={ih} stroke="#163a63" strokeOpacity={0.5} strokeDasharray="4 4" />
                 <text x={sx(ceilingDb)} y={-8} textAnchor="end" className="fill-muted text-[10px]">
                   random-phase ceiling {formatDb(ceilingDb)}
                 </text>
@@ -102,7 +102,7 @@ export default function LossBars({ rows, ceilingDb, ariaLabel, width: fixedWidth
                 </g>
               );
             })}
-            <line x1={0} x2={0} y1={0} y2={ih} stroke="#33445e" />
+            <line x1={0} x2={0} y1={0} y2={ih} stroke="#9fb6cc" />
           </g>
         </svg>
       )}

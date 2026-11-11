@@ -31,7 +31,8 @@ export default function SatelliteIntegration() {
             <stop offset="1" stopColor="#5b8cff" stopOpacity="0.02" />
           </linearGradient>
         </defs>
-        <path d="M0 268 Q 160 250 320 262 T 640 266 V300 H0Z" fill="#0d1726" />
+        <rect width="640" height="300" rx="18" fill="#0f2a4a" />
+        <path d="M0 268 Q 160 250 320 262 T 640 266 V300 H0Z" fill="#163a63" />
         <ellipse {...SWATH} fill="none" stroke="#5b8cff" strokeOpacity={0.55} strokeDasharray="3 4" />
         <text x={SWATH.cx} y={SWATH.cy + 30} textAnchor="middle" className="fill-[#7d8ba1] text-[13px]">Common imaged swath</text>
         {SATS.map((s) => (
