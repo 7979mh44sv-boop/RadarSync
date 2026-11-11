@@ -36,7 +36,7 @@ export default function CoherencePanel({ data, width }: { data: CoherenceRespons
       ]} />
       <div className="grid gap-6 xl:grid-cols-2">
         <div>
-          <h3 className="text-sm font-medium">Temporal: within one CPI, per bistatic node pair</h3>
+          <h3 className="text-sm font-medium">Temporal: within one CPI, per bistatic satellite pair</h3>
           <p className="mb-2 text-xs text-muted">
             Phase variation of each node pair inside a {formatSeconds(p.cpi_s.value)} coherent processing interval. A constant offset cancels.
             Ceiling for fully random phase: {formatDb(data.loss_ceiling_temporal_db)}.
@@ -44,7 +44,7 @@ export default function CoherencePanel({ data, width }: { data: CoherenceRespons
           <LossBars width={width} rows={rows(data, "temporal")} ceilingDb={data.loss_ceiling_temporal_db} ariaLabel="Temporal coherent integration loss by scenario in dB" />
         </div>
         <div>
-          <h3 className="text-sm font-medium">Spatial: across all {p.n_nodes.value} nodes at one instant</h3>
+          <h3 className="text-sm font-medium">Spatial: across all {p.n_nodes.value} satellite radar nodes at one instant</h3>
           <p className="mb-2 text-xs text-muted">
             Coherent combination of all node phases; absolute node-to-node offsets (sync, calibration) matter.
             Ceiling for fully random phase: {formatDb(data.loss_ceiling_spatial_db)}.

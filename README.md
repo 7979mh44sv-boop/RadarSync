@@ -1,6 +1,6 @@
 # RadarSync
 
-**Precision Timing. Distributed Intelligence.**
+**One Constellation. One Coherent Radar.** The precision timing backbone for distributed satellite radar.
 
 RadarSync is a scientific simulation and web dashboard built for the
 **NextSemi Deep-Tech Hackathon** (imec.xpand *Chip-Scale Atomic Clock Venture Challenge*).
@@ -12,6 +12,35 @@ creates measurable, system-level value in **distributed radar**.
 > and timing-error model (Phase 2), the API/dashboard (Phase 2.5) and the sensitivity analysis with
 > modelled clock-stability requirements (Phase 3) are implemented and numerically validated. All system parameters are assumptions and all results
 > are simulated. The repository makes **no detection-range, RCS or operational performance claims**.
+
+## Product and MVP scope
+
+**Proposed product:** the *RadarSync Timing Box*, a compact atomic-clock-based precision timing module for distributed
+satellite radar (clock core, reference signal generation, environmental stabilisation, calibration and sync software).
+**The hardware has not been built.** This repository is the scientific software proof of concept behind it.
+
+**MVP market:** distributed satellite radar only. Initial buyer groups to investigate (hypotheses, no confirmed intent):
+satellite radar payload manufacturers, distributed SAR mission developers and satellite system integrators. Aviation and
+other distributed sensing markets are a long-term growth hypothesis.
+
+The simulation models clock and non-clock timing errors and coherence loss. It does **not** model orbital dynamics, the
+inter-satellite link, SAR image formation, radiation or space qualification, and never claims link-free, indefinite coherence.
+
+## 2-minute live demo script
+
+Start both services (see *Quick start*) and open http://localhost:3000.
+
+1. **0:00 Hero (15 s).** "One Constellation. One Coherent Radar." Point to the conceptual Timing Box and say the hardware is proposed, not built.
+2. **0:15 Product (20 s).** Scroll to *RadarSync Timing Box*: the four proposed components and the conceptual satellite integration diagram.
+3. **0:35 Key insight (25 s).** Live requirement solver: the clock stability a 1 dB spatial-coherence target needs, where non-clock errors take
+   over, and the SA65 model vs. the hypothetical NextGen CSAC. All values are labelled SIMULATED.
+4. **1:00 Live demo (30 s).** Click the preset *Long holdover: 10 s sync*, then panel C (coherence) and panel G with *Synchronisation interval*:
+   weaker clocks lose coherence as satellites re-synchronise less often; the benefit is conditional on clock error dominating.
+5. **1:30 Value chain and evidence (20 s).** Research → customer problem → hardware capability → simulated evidence → buyer benefit →
+   remaining validation, then *What we have validated / what remains unproven*.
+6. **1:50 Roadmap (10 s).** Five stages from proof of concept to space qualification, plus engineering risks and mitigations.
+
+The page sections follow the presentation order: Part 1 Why us → Part 2 How → Part 3 What.
 
 ## Validation principles (from the challenge brief)
 

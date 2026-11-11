@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "RadarSync | Precision Timing. Distributed Intelligence.",
+  title: "RadarSync — One Constellation. One Coherent Radar.",
   description:
-    "RadarSync: system-level simulation of chip-scale atomic clock timing for distributed radar.",
+    "RadarSync: the precision timing backbone for distributed satellite radar — proposed Timing Box hardware and a validated clock-to-coherence simulation.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

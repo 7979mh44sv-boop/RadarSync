@@ -7,6 +7,9 @@ import CoherencePanel from "@/components/panels/CoherencePanel";
 import ControlsPanel, { specOf } from "@/components/panels/ControlsPanel";
 import ProvenancePanel from "@/components/panels/ProvenancePanel";
 import Phase3Section from "@/components/Phase3Section";
+import GuidedDemo, { type DemoPreset } from "@/components/story/GuidedDemo";
+import KeyInsightPanel from "@/components/story/KeyInsightPanel";
+import { useDefaultInsight } from "@/lib/defaultInsight";
 import TimingErrorPanel from "@/components/panels/TimingErrorPanel";
 import {
   api,
@@ -64,6 +67,7 @@ export default function Dashboard() {
   const [pair, setPair] = useState<[number, number]>([0, 1]);
   const [ranConfig, setRanConfig] = useState<NetworkConfig | null>(null);
   const runAbort = useRef<AbortController | null>(null);
+  const [activePreset, setActivePreset] = useState<string | null>(null);
 
   // Metadata: scenarios, parameter ranges, limitations. (Loading state is set by callers.)
   const fetchMeta = useCallback(() => {
@@ -118,6 +122,10 @@ export default function Dashboard() {
     runTiming(cfg, tKey, p, ctrl.signal);
   }, [runTiming]);
 
+  // Key insight: Phase 3 requirement at the default (assumed) configuration, shared with the value chain.
+  const insightConfig = meta.data ? defaultConfig(meta.data.params) : null;
+  const insight = useDefaultInsight();
+
   // First run with defaults once metadata is available.
   const firstRun = useRef(false);
   useEffect(() => {
@@ -143,14 +151,36 @@ export default function Dashboard() {
 
   const { scenarios, params, limitations } = meta.data;
   const toggle = (key: string) => setSelected((s) => (s.includes(key) ? s.filter((k) => k !== key) : scenarios.scenarios.map((x) => x.key).filter((k) => k === key || s.includes(k))));
-  const patch = (p: Partial<NetworkConfig>) => setConfig((c) => (c ? { ...c, ...p } : c));
+  const patch = (p: Partial<NetworkConfig>) => {
+    setActivePreset(null);
+    setConfig((c) => (c ? { ...c, ...p } : c));
+  };
+  const applyPreset = (preset: DemoPreset) => {
+    const next = { ...config, ...preset.patch };
+    const p: [number, number] = pair[0] < next.n_nodes && pair[1] < next.n_nodes ? pair : [0, 1];
+    const key = selected.includes(timingKey) ? timingKey : selected[0];
+    setActivePreset(preset.id);
+    setConfig(next);
+    setPair(p);
+    setTimingKey(key);
+    if (selected.length) run(next, selected, key, p);
+  };
   const shown = ranConfig ?? config;
   const nodesForPair = ranConfig?.n_nodes ?? config.n_nodes;
 
   return (
-    <div className="mx-auto grid w-full max-w-7xl gap-6 px-4 py-8 sm:px-6 lg:grid-cols-[300px_minmax(0,1fr)]">
+    <div className="mx-auto w-full max-w-7xl space-y-6 px-4 py-8 sm:px-6">
+      <Panel id="insight" eyebrow="Key insight" title="When does clock stability matter for satellite radar coherence?"
+        subtitle="Live result of the Phase 3 requirement solver at the default assumptions: 1 dB spatial coherence-loss target, every clock noise shape.">
+        <KeyInsightPanel state={insight} config={insightConfig} />
+      </Panel>
+      <Panel id="demo" eyebrow="Guided demo" title="Live demo: from clock stability to radar coherence"
+        subtitle="Jump to each panel, or apply a preset that sets the controls and runs the unchanged simulation.">
+        <GuidedDemo onPreset={applyPreset} activePreset={activePreset} running={coh.state === "loading"} />
+      </Panel>
+    <div className="grid w-full gap-6 lg:grid-cols-[300px_minmax(0,1fr)]">
       <aside className="lg:sticky lg:top-6 lg:self-start">
-        <Panel eyebrow="D · Controls" title="Simulation setup">
+        <Panel id="controls" eyebrow="D · Controls" title="Simulation setup">
           <ControlsPanel
             params={params} scenarios={scenarios.scenarios} selected={selected} onToggle={toggle}
             config={config} onChange={patch} running={coh.state === "loading"}
@@ -175,7 +205,7 @@ export default function Dashboard() {
           )}
         </Panel>
 
-        <Panel id="timing" eyebrow="B · Timing error" title="Relative timing error between two nodes"
+        <Panel id="timing" eyebrow="B · Timing error" title="Relative timing error between two satellite radar nodes"
           subtitle={`After synchronisation (${shown.sync_mode === "none" ? "single alignment at t = 0" : `${shown.sync_mode.replace("_", " + ")} sync every ${shown.sync_interval_s} s`}), split into clock-induced and non-clock contributions.`}
           actions={
             <div className="flex flex-wrap items-center gap-2 text-xs">
@@ -185,14 +215,14 @@ export default function Dashboard() {
                 {selected.map((k) => <option key={k} value={k}>{styleFor(k).short}</option>)}
               </select>
               {[0, 1].map((side) => (
-                <select key={side} aria-label={side === 0 ? "First node" : "Second node"} className="rounded-md border border-border bg-background/60 px-2 py-1"
+                <select key={side} aria-label={side === 0 ? "First satellite" : "Second satellite"} className="rounded-md border border-border bg-background/60 px-2 py-1"
                   value={pair[side]}
                   onChange={(e) => {
                     const p: [number, number] = side === 0 ? [Number(e.target.value), pair[1]] : [pair[0], Number(e.target.value)];
                     setPair(p);
                     if (ranConfig && p[0] !== p[1]) runTiming(ranConfig, timingKey, p);
                   }}>
-                  {Array.from({ length: nodesForPair }, (_, i) => <option key={i} value={i}>Node {i}</option>)}
+                  {Array.from({ length: nodesForPair }, (_, i) => <option key={i} value={i}>Satellite {i}</option>)}
                 </select>
               ))}
             </div>
@@ -205,7 +235,7 @@ export default function Dashboard() {
         </Panel>
 
         <Panel id="coherence" eyebrow="C · Radar coherence" title="Coherent integration loss"
-          subtitle={`Same configuration and random numbers for every scenario: ${formatHz(shown.carrier_frequency_hz)} carrier, ${shown.n_nodes} nodes, ${shown.observation_s} s observation. Loss = −10·log₁₀(mean coherent gain); clock-only and non-clock-only losses separate the error sources.`}>
+          subtitle={`Same configuration and random numbers for every scenario: ${formatHz(shown.carrier_frequency_hz)} carrier, ${shown.n_nodes} satellite radar nodes, ${shown.observation_s} s observation. Loss = −10·log₁₀(mean coherent gain); clock-only and non-clock-only losses separate the error sources.`}>
           {coh.state === "ready" && coh.data ? (
             <CoherencePanel data={coh.data} />
           ) : (
@@ -221,6 +251,7 @@ export default function Dashboard() {
           <ProvenancePanel scenarios={scenarios} limitations={limitations} />
         </Panel>
       </div>
+    </div>
     </div>
   );
 }

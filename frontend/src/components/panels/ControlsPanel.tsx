@@ -95,7 +95,7 @@ export default function ControlsPanel({ params, scenarios, selected, onToggle, c
         {!carrierValid && <p className="mt-1 text-[11px] text-danger">Enter a value between {ghzMin} and {ghzMax} GHz.</p>}
       </Field>
 
-      <Field label={`Radar nodes: ${config.n_nodes}`} hint={`${nMin}–${nMax}`}>
+      <Field label={`Satellite radar nodes: ${config.n_nodes}`} hint={`${nMin}–${nMax}`}>
         <input type="range" min={nMin} max={nMax} step={1} value={config.n_nodes} className="w-full accent-[#38e1c6]"
           onChange={(e) => onChange({ n_nodes: Number(e.target.value) })} />
       </Field>

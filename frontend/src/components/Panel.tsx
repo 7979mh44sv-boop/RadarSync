@@ -11,11 +11,12 @@ export function Panel({ id, eyebrow, title, subtitle, actions, children }: {
   children: ReactNode;
 }) {
   return (
-    <section id={id} className="rounded-2xl border border-border bg-surface/80 p-5 backdrop-blur sm:p-6">
+    <section id={id} tabIndex={id ? -1 : undefined} aria-labelledby={id ? `${id}-title` : undefined}
+      className="scroll-mt-6 rounded-2xl border border-border bg-surface/80 p-5 outline-none backdrop-blur focus-visible:ring-2 focus-visible:ring-accent/60 sm:p-6">
       <header className="mb-4 flex flex-wrap items-start justify-between gap-3">
         <div>
           <p className="font-mono text-[11px] uppercase tracking-[0.25em] text-accent">{eyebrow}</p>
-          <h2 className="mt-1 text-lg font-semibold tracking-tight">{title}</h2>
+          <h2 id={id ? `${id}-title` : undefined} className="mt-1 text-lg font-semibold tracking-tight">{title}</h2>
           {subtitle && <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted">{subtitle}</p>}
         </div>
         {actions}

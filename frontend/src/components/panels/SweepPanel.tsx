@@ -11,7 +11,7 @@ const Y_FLOOR = 1e-3;
 const LABELS: Record<string, string> = {
   clock_scale: "Clock-noise scale s (σy → s·σy) [dimensionless]",
   carrier_frequency_hz: "Carrier frequency [GHz]",
-  n_nodes: "Number of radar nodes",
+  n_nodes: "Number of satellite radar nodes",
   observation_s: "Observation duration [s]",
   sync_interval_s: "Synchronisation interval [s]",
   clock_correlation: "Clock correlation ρ [dimensionless]",
